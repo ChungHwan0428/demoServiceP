@@ -11,6 +11,7 @@ public class TokenService {
 
     private final JwtHandler jwtHandler;
 
+
     @Value("${jwt.max-age.access}")
     private long accessTokenMaxAgeSeconds;
 
