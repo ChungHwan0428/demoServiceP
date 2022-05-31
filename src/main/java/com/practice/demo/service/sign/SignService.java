@@ -51,7 +51,7 @@ public class SignService {
     }
 
     private void validatePassword(SignInRequest request, Member member){
-        if(!passwordEncoder.matches(request.getPasswrod(), member.getPassword())){
+        if(!passwordEncoder.matches(request.getPassword(), member.getPassword())){
             throw new LoginFailurException();
         }
     }
