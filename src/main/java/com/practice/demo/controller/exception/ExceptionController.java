@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExceptionController {
 
     @GetMapping("/exception/entry-point")
-    public void entryPoint(){
+    public void entryPoint() {
         throw new AuthenticationEntryPointException();
     }
 
     @GetMapping("/exception/access-denied")
-    public void accessDenied(){
+    public void accessDenied() {
         throw new AccessDeniedException();
     }
 }

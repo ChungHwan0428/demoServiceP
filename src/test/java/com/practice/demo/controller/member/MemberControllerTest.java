@@ -42,7 +42,7 @@ public class MemberControllerTest {
     }
 
     @Test
-    void deteleTest() throws Exception{
+    void deleteTest() throws Exception{
         //given
         Long id = 1L;
 

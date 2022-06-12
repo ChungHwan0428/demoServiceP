@@ -2,26 +2,34 @@ package com.practice.demo.config.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Getter
 @AllArgsConstructor
+@Slf4j
 public class CustomUserDetails implements UserDetails {
 
     private final String userId;
     private final Set<GrantedAuthority> authorities;
 
     @Override
-    public String getPassword() {
-        throw new UnsupportedOperationException();
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
     }
 
     @Override
     public String getUsername() {
         return userId;
+    }
+
+    @Override
+    public String getPassword() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

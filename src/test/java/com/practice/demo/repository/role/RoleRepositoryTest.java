@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import static com.practice.demo.factory.entity.RoleFactory.createRole;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -71,9 +72,6 @@ public class RoleRepositoryTest {
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
-    private Role createRole() {
-        return new Role(RoleType.ROLE_NORMAL);
-    }
 
     private void clear() {
         em.flush();

@@ -1,4 +1,4 @@
-package com.practice.demo;
+package com.practice.demo.init;
 
 import com.practice.demo.entity.member.Member;
 import com.practice.demo.entity.member.Role;

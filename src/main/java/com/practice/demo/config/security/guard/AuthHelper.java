@@ -3,6 +3,8 @@ package com.practice.demo.config.security.guard;
 import com.practice.demo.config.security.CustomAuthenticationToken;
 import com.practice.demo.config.security.CustomUserDetails;
 import com.practice.demo.entity.member.RoleType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,14 +31,6 @@ public class AuthHelper {
                 .map(authority -> authority.getAuthority())
                 .map(strAuth -> RoleType.valueOf(strAuth))
                 .collect(Collectors.toSet());
-    }
-
-    public boolean isAccessTokenType() {
-        return "access".equals(((CustomAuthenticationToken) getAuthentication()).getType());
-    }
-
-    public boolean isRefreshTokenType() {
-        return "refresh".equals(((CustomAuthenticationToken) getAuthentication()).getType());
     }
 
     private CustomUserDetails getUserDetails() {

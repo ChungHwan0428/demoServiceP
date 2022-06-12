@@ -1,6 +1,8 @@
 package com.practice.demo.service.sign;
 
 import com.mysql.cj.log.Log;
+import com.practice.demo.config.token.TokenHelper;
+import com.practice.demo.dto.sign.RefreshTokenResponse;
 import com.practice.demo.dto.sign.SignInRequest;
 import com.practice.demo.dto.sign.SignInResponse;
 import com.practice.demo.dto.sign.SignUpRequest;
@@ -10,6 +12,7 @@ import com.practice.demo.entity.member.RoleType;
 import com.practice.demo.exception.*;
 import com.practice.demo.repository.member.MemberRepository;
 import com.practice.demo.repository.role.RoleRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static com.practice.demo.factory.dto.SignUpRequestFactory.createSignUpRequest;
+import static com.practice.demo.factory.entity.MemberFactory.createMember;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,7 +35,6 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class SignServiceTest {
 
-    @InjectMocks
     SignService signService;
     @Mock
     MemberRepository memberRepository;
@@ -39,7 +43,14 @@ public class SignServiceTest {
     @Mock
     PasswordEncoder passwordEncoder;
     @Mock
-    TokenService tokenService;
+    TokenHelper accessTokenHelper;
+    @Mock
+    TokenHelper refreshTokenHelper;
+
+    @BeforeEach
+    void before(){
+        signService = new SignService(memberRepository,roleRepository,passwordEncoder,accessTokenHelper,refreshTokenHelper);
+    }
 
     @Test
     void signUpTest(){
@@ -91,8 +102,8 @@ public class SignServiceTest {
         //given
         given(memberRepository.findByEmail(any())).willReturn(Optional.of(createMember()));
         given(passwordEncoder.matches(anyString(),anyString())).willReturn(true);
-        given(tokenService.createAccessToken(anyString())).willReturn("access");
-        given(tokenService.createRefreshToken(anyString())).willReturn("refresh");
+        given(accessTokenHelper.createToken(anyString())).willReturn("access");
+        given(refreshTokenHelper.createToken(anyString())).willReturn("refresh");
 
         //when
         SignInResponse response = signService.signIn(new SignInRequest("email", "password"));
@@ -123,11 +134,33 @@ public class SignServiceTest {
                 .isInstanceOf(LoginFailurException.class);
     }
 
-    private SignUpRequest createSignUpRequest(){
-        return new SignUpRequest("email","password","username","nickname");
+    @Test
+    void refreshTokenTest (){
+        //given
+        String refreshToken = "refreshToken";
+        String subject = "subject";
+        String accessToken = "accessToken";
+        given(refreshTokenHelper.validate(refreshToken)).willReturn(true);
+        given(refreshTokenHelper.extractSubject(refreshToken)).willReturn(subject);
+        given(accessTokenHelper.createToken(subject)).willReturn(accessToken);
+
+        //when
+        RefreshTokenResponse response = signService.refreshToken(refreshToken);
+
+        //then
+        assertThat(response.getAccessToken()).isEqualTo(accessToken);
     }
 
-    private Member createMember(){
-        return new Member("email","password","username","nickname",emptyList());
+    @Test
+    void refreshTokenExceptionByInvalideTokenTest (){
+        //given
+        String refreshToken = "refreshToken";
+        given(refreshTokenHelper.validate(refreshToken)).willReturn(false);
+
+        //when
+        //then
+        assertThatThrownBy(()->signService.refreshToken(refreshToken))
+                .isInstanceOf(AuthenticationEntryPointException.class);
+
     }
 }

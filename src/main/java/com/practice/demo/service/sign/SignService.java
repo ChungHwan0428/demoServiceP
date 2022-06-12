@@ -1,5 +1,7 @@
 package com.practice.demo.service.sign;
 
+import com.practice.demo.config.token.TokenHelper;
+import com.practice.demo.dto.sign.RefreshTokenResponse;
 import com.practice.demo.dto.sign.SignInRequest;
 import com.practice.demo.dto.sign.SignInResponse;
 import com.practice.demo.dto.sign.SignUpRequest;
@@ -16,13 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class SignService {
 
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenService tokenService;
+
+    private final TokenHelper accessTokenHelper;
+    private final TokenHelper refreshTokenHelper;
 
     @Transactional
     public void signUp(SignUpRequest request){
@@ -32,13 +35,14 @@ public class SignService {
                 passwordEncoder));
     }
 
+    @Transactional(readOnly = true)
     public SignInResponse signIn(SignInRequest request){
         Member member = memberRepository.findByEmail(request.getEmail()).orElseThrow(MemberNotFoundException::new);
         validatePassword(request,member);
 
         String subject = creatSubject(member);
-        String accessToken = tokenService.createAccessToken(subject);
-        String refreshToken = tokenService.createRefreshToken(subject);
+        String accessToken = accessTokenHelper.createToken(subject);
+        String refreshToken = refreshTokenHelper.createToken(subject);
         return new SignInResponse(accessToken,refreshToken);
     }
 
@@ -58,5 +62,18 @@ public class SignService {
 
     private String creatSubject(Member member){
         return String.valueOf(member.getId());
+    }
+
+    public RefreshTokenResponse refreshToken(String refreshToken){
+        validateRefreshToken(refreshToken);
+        String subject = refreshTokenHelper.extractSubject(refreshToken);
+        String accessToken = accessTokenHelper.createToken(subject);
+        return new RefreshTokenResponse(accessToken);
+    }
+
+    private void validateRefreshToken(String refreshToken){
+        if(!refreshTokenHelper.validate(refreshToken)){
+            throw new AuthenticationEntryPointException();
+        }
     }
 }

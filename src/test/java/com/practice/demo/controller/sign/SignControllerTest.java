@@ -1,6 +1,7 @@
 package com.practice.demo.controller.sign;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practice.demo.dto.sign.RefreshTokenResponse;
 import com.practice.demo.dto.sign.SignInRequest;
 import com.practice.demo.dto.sign.SignInResponse;
 import com.practice.demo.dto.sign.SignUpRequest;
@@ -84,5 +85,18 @@ public class SignControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.result").doesNotExist());
 
+    }
+
+    @Test
+    void refreshTokenTest () throws Exception{
+        //given
+        given(signService.refreshToken("refreshToken")).willReturn(new RefreshTokenResponse("accessToken"));
+
+        //when
+        //then
+        mockMvc.perform(post("/api/refresh-token")
+                .header("Authorization","refreshToken"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.data.accessToken").value("accessToken"));
     }
 }
