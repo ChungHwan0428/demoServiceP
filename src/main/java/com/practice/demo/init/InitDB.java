@@ -1,9 +1,11 @@
 package com.practice.demo.init;
 
+import com.practice.demo.entity.category.Category;
 import com.practice.demo.entity.member.Member;
 import com.practice.demo.entity.member.Role;
 import com.practice.demo.entity.member.RoleType;
 import com.practice.demo.exception.RoleNotFoundException;
+import com.practice.demo.repository.category.CategoryRepository;
 import com.practice.demo.repository.member.MemberRepository;
 import com.practice.demo.repository.role.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class InitDB {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final CategoryRepository categoryRepository;
 
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
@@ -37,6 +40,7 @@ public class InitDB {
         initRole();
         initTestAdmin();
         initTestMember();
+        initCategory();
     }
 
     private void initTestMember() {
@@ -62,4 +66,16 @@ public class InitDB {
                                 roleRepository.findByRoleType(RoleType.ROLE_ADMIN).orElseThrow(RoleNotFoundException::new)))
         );
     }
+
+    private void initCategory() {
+        Category c1 = categoryRepository.save(new Category("category1", null));
+        Category c2 = categoryRepository.save(new Category("category2", c1));
+        Category c3 = categoryRepository.save(new Category("category3", c1));
+        Category c4 = categoryRepository.save(new Category("category4", c2));
+        Category c5 = categoryRepository.save(new Category("category5", c2));
+        Category c6 = categoryRepository.save(new Category("category6", c4));
+        Category c7 = categoryRepository.save(new Category("category7", c3));
+        Category c8 = categoryRepository.save(new Category("category8", null));
+    }
+
 }

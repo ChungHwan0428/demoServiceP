@@ -40,3 +40,5 @@ out/
 
 application.properties
 application-secret.properties
+
+/src/test/resources/static/*
