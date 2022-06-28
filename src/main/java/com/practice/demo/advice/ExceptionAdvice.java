@@ -4,6 +4,7 @@ import com.practice.demo.controller.response.Response;
 import com.practice.demo.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,11 +22,11 @@ public class ExceptionAdvice {
         return Response.failure(-1000,"오류 발생");
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Response methodArgumentNotValidException(MethodArgumentNotValidException e){
-        return Response.failure(-1003,e.getBindingResult().getFieldError().getDefaultMessage());
-    }
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public Response methodArgumentNotValidException(MethodArgumentNotValidException e){
+//        return Response.failure(-1003,e.getBindingResult().getFieldError().getDefaultMessage());
+//    }
 
     @ExceptionHandler(LoginFailurException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -74,4 +75,43 @@ public class ExceptionAdvice {
     public Response missingRequestHeaderException(MissingRequestHeaderException e) {
         return Response.failure(-1009, e.getHeaderName() + " 요청 헤더가 누락되었습니다.");
     }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response categoryNotFoundException() {
+        return Response.failure(-1010, "존재하지 않는 카테고리입니다.");
+    }
+
+    @ExceptionHandler(CannotConvertNestedStructureException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Response cannotConvertNestedStructureException(CannotConvertNestedStructureException e) {
+        log.info("e = {}", e.getMessage());
+        return Response.failure(-1011, "중첩 구조 변환에 실패하였습니다.");
+    }
+
+    @ExceptionHandler(BindException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response bindException(BindException e) {
+        return Response.failure(-1003, e.getBindingResult().getFieldError().getDefaultMessage());
+    }
+
+    @ExceptionHandler(FileUploadFailureException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response fileUploadFailureException(FileUploadFailureException e) {
+        log.info("e = {}", e.getMessage());
+        return Response.failure(-1014, "파일 업로드에 실패하였습니다.");
+    }
+
+    @ExceptionHandler(UnsupportedImageFormatException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response unsupportedImageFormatException() {
+        return Response.failure(-1013,"지원하지 않는 파일 형식입니다.");
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response postNotFoundException() {
+        return Response.failure(-1012,"파일이 없습니다.");
+    }
+
 }

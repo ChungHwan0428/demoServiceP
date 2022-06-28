@@ -1,6 +1,7 @@
 package com.practice.demo.service.member;
 
 import com.practice.demo.dto.member.MemberDto;
+import com.practice.demo.entity.member.Member;
 import com.practice.demo.exception.MemberNotFoundException;
 import com.practice.demo.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,8 @@ public class MemberService {
 
     @Transactional
     public void delete(Long id){
-        if(notExistsMember(id))throw new MemberNotFoundException();
-        memberRepository.deleteById(id);
+        Member member = memberRepository.findById(id).orElseThrow(MemberNotFoundException::new);
+        memberRepository.delete(member);
     }
 
-    private boolean notExistsMember(Long id) {
-        return !memberRepository.existsById(id);
-    }
 }

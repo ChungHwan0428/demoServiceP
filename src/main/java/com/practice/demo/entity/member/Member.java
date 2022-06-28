@@ -1,7 +1,9 @@
 package com.practice.demo.entity.member;
 
 
+import com.practice.demo.entity.category.Category;
 import com.practice.demo.entity.common.EntityDate;
+import com.practice.demo.entity.post.Post;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,12 @@ import static java.util.stream.Collectors.toSet;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 파라미터가 없는 생성자를 자동으로 생성한다.
+@NamedEntityGraph(
+        name = "Member.roles",
+        attributeNodes = @NamedAttributeNode(value = "roles", subgraph = "Member.roles.role"),
+        subgraphs = @NamedSubgraph(name = "Member.roles.role", attributeNodes = @NamedAttributeNode("role"))
+)
+
 public class Member extends EntityDate {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +42,10 @@ public class Member extends EntityDate {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MemberRole> roles;
+
+    //이렇게 안해도 될꺼같은데...음 ...
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL ,orphanRemoval = true)
+    private List<Post> posts;
 
     public Member(String email, String password, String username, String nickname, List<Role> roles) {
         this.email = email;
