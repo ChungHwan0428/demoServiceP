@@ -40,5 +40,7 @@ out/
 
 application.properties
 application-secret.properties
+application-local.yml
+application-test.yml
 
 /src/test/resources/static/*
